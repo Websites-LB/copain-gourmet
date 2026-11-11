@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "copain-site", "runtimeExecutable": "node", "runtimeArgs": ["dev-server.mjs", "4173"], "port": 4173 }
+  ]
+}
