@@ -211,15 +211,6 @@
     io.observe(dayEl);
   }
 
-  /* ── nav: tuck away on the way down, return on the way up ── */
-  const nav = $('[data-nav]');
-  let lastY = 0;
-  addEventListener('scroll', () => {
-    const y = scrollY;
-    nav.classList.toggle('is-hidden', y > lastY && y > 240);
-    lastY = y;
-  }, { passive: true });
-
   /* ── 4. motion ─────────────────────────────────── */
   let lenis = null;
   const canAnimate = window.gsap && window.ScrollTrigger && !reduce;
@@ -324,10 +315,11 @@
   ScrollTrigger.config({ ignoreMobileResize: true });
   day.classList.add('is-horizontal');
   const dist = () => track.scrollWidth - innerWidth;
-  const stretch = () => (innerWidth < 900 ? 1.8 : 1);
+  // How much scrolling one hour takes, as a share of the screen's width. Lower = faster.
+  const stretch = () => (innerWidth < 900 ? 1.2 : .5);
   const ride = gsap.to(track, {
     x: () => -dist(), ease: 'none',
-    scrollTrigger: { trigger: day, pin: true, scrub: .5, start: 'top top', end: () => `+=${dist() * stretch()}`, anticipatePin: 1, invalidateOnRefresh: true, onUpdate: (s) => paintClock(s.progress) },
+    scrollTrigger: { trigger: day, pin: true, scrub: .3, start: 'top top', end: () => `+=${dist() * stretch()}`, anticipatePin: 1, invalidateOnRefresh: true, onUpdate: (s) => paintClock(s.progress) },
   });
   paintClock(0);
   hours.forEach((hour) => {
