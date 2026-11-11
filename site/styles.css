@@ -228,23 +228,51 @@ button, input, select { font: inherit; color: inherit; }
 .day__hud { display: none; }
 @media (min-width: 900px) { .hour { grid-template-columns: 1fr 1fr; align-items: center; gap: var(--s10); } }
 
+/* The pinned ride. .is-horizontal is added by main.js only when the scroll-driven clock can run;
+   until then (no script, reduced motion) the hours simply stack. */
+.day { --u: 1vh; }
+@supports (height: 1svh) { .day { --u: 1svh; } }
+.day.is-horizontal { height: 100vh; height: 100dvh; }
+.is-horizontal .day__track { display: flex; width: max-content; height: 100%; will-change: transform; }
+.is-horizontal .hour { flex: 0 0 100vw; height: 100%; overflow: hidden; }
+.is-horizontal .day__hud {
+  position: absolute; z-index: 5; left: 0; right: 0; bottom: var(--s3); width: max-content; margin-inline: auto;
+  display: flex; align-items: center; gap: var(--s2); height: var(--s8); padding: 0 var(--s3) 0 var(--s2);
+  background: var(--cream); color: var(--ink); border: 1.5px solid var(--ink); border-radius: 999px; box-shadow: 0 8px 24px var(--shadow);
+}
+.day__arc { flex: none; width: 120px; height: 36px; stroke-dasharray: 2 7; opacity: .5; }
+.day__sun { position: absolute; left: var(--s2); top: 14px; width: var(--s3); height: var(--s3); margin: -12px 0 0 -12px; will-change: transform; }
+.day__sun svg { position: absolute; inset: 0; }
+.sun { color: var(--ink); fill: var(--sun); }
+.moon { color: var(--ink); fill: var(--cream); opacity: 0; }
+.day__time { font-weight: 900; font-size: 22px; font-variant-numeric: tabular-nums; min-width: 3.2em; text-align: right; }
+
 @media (min-width: 900px) {
-  /* .is-horizontal is added by main.js only when the pinned scroll can run */
-  .day.is-horizontal { height: 100vh; }
-  .is-horizontal .day__track { display: flex; width: max-content; height: 100%; will-change: transform; }
-  .is-horizontal .hour { flex: 0 0 100vw; height: 100%; grid-template-columns: 1fr 1fr; align-items: center; gap: var(--s10); padding: var(--s12) clamp(48px, 8vw, 128px) var(--s16); }
+  .is-horizontal .hour { grid-template-columns: 1fr 1fr; align-items: center; gap: var(--s10); padding: var(--s12) clamp(48px, 8vw, 128px) var(--s16); }
   .is-horizontal .hour--intro .hour__copy { max-width: 720px; }
-  .is-horizontal .day__hud {
-    position: absolute; z-index: 5; left: 50%; bottom: var(--s3); transform: translateX(-50%);
-    display: flex; align-items: center; gap: var(--s2); height: var(--s8); padding: 0 var(--s3) 0 var(--s2);
-    background: var(--cream); color: var(--ink); border: 1.5px solid var(--ink); border-radius: 999px; box-shadow: 0 8px 24px var(--shadow);
-  }
-  .day__arc { width: 120px; height: 36px; stroke-dasharray: 2 7; opacity: .5; }
-  .day__sun { position: absolute; left: var(--s2); top: 14px; width: var(--s3); height: var(--s3); margin: -12px 0 0 -12px; will-change: transform; }
-  .day__sun svg { position: absolute; inset: 0; }
-  .sun { color: var(--ink); fill: var(--sun); }
-  .moon { color: var(--ink); fill: var(--cream); opacity: 0; }
-  .day__time { font-weight: 900; font-size: 22px; font-variant-numeric: tabular-nums; min-width: 3.2em; text-align: right; }
+}
+@media (max-width: 899px) {
+  /* phone: one hour per screen, with the photo sized from the screen's height so it always fits */
+  .is-horizontal .hour { align-content: center; gap: var(--s2); padding: var(--s8) var(--gutter) var(--s12); }
+  .is-horizontal .hour__art { height: calc(22 * var(--u)); }
+  .is-horizontal .hour__art .frame { width: calc(17.6 * var(--u)); }
+  .is-horizontal .hour__art .frame--round { width: calc(20 * var(--u)); }
+  .is-horizontal .hour__art .frame--wide { width: calc(27.5 * var(--u)); }
+  .is-horizontal .hour__art--pair { grid-template-columns: auto auto; justify-content: center; }
+  .is-horizontal .hour__art--pair .frame--card { transform: translateY(var(--s1)) rotate(3deg); }
+  .is-horizontal .hour__art .doodle { width: var(--s8); }
+  .is-horizontal .hour__time { font-size: clamp(64px, 21vw, 96px); }
+  .is-horizontal .hour__name { font-size: 40px; margin-top: var(--s1); }
+  .is-horizontal .hour .body { font-size: 16px; line-height: 1.45; margin-top: var(--s1); }
+  .is-horizontal .dishes { margin-top: var(--s2); }
+  .is-horizontal .dishes li { padding: var(--s1) 0; font-size: 16px; }
+  .is-horizontal .hour .handoff { margin-top: var(--s2); }
+  .is-horizontal .hour .handoff .script { font-size: 28px; }
+  .is-horizontal .hour--intro { gap: var(--s5); }
+  .is-horizontal .hour--intro .doodle--door { width: calc(18 * var(--u)); }
+}
+@media (max-width: 899px) and (max-height: 620px) {
+  .is-horizontal .hour:not(.hour--intro) .body { display: none; }
 }
 
 /* ── offers on the tile wall ───────────────────── */

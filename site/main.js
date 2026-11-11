@@ -318,27 +318,24 @@
   const dayDoodles = $$('.day .draw');
   dayDoodles.forEach((d) => prepDraw($$('path', d)));
 
-  const mm = gsap.matchMedia();
-  mm.add('(min-width: 900px)', () => {
-    day.classList.add('is-horizontal');
-    const dist = () => track.scrollWidth - innerWidth;
-    const ride = gsap.to(track, {
-      x: () => -dist(), ease: 'none',
-      scrollTrigger: { trigger: day, pin: true, scrub: .5, start: 'top top', end: () => `+=${dist()}`, invalidateOnRefresh: true, onUpdate: (s) => paintClock(s.progress) },
-    });
-    paintClock(0);
-    hours.forEach((hour) => {
-      gsap.from(hourBits(hour), { y: 40, opacity: 0, stagger: .06, scrollTrigger: { trigger: hour, containerAnimation: ride, start: 'left 62%' } });
-      $$('.hour__img', hour).forEach((im) => gsap.fromTo(im, { xPercent: 14 }, { xPercent: -14, ease: 'none', scrollTrigger: { trigger: hour, containerAnimation: ride, start: 'left right', end: 'right left', scrub: true } }));
-      $$('.draw', hour).forEach((d) => ScrollTrigger.create({ trigger: hour, containerAnimation: ride, start: 'left 50%', once: true, onEnter: () => draw($$('path', d)) }));
-    });
-    $$('.hour--intro .draw').forEach((d) => ScrollTrigger.create({ trigger: day, start: 'top 60%', once: true, onEnter: () => draw($$('path', d), .2) }));
-    return () => { day.classList.remove('is-horizontal'); gsap.set(track, { clearProps: 'transform' }); };
+  // Same ride on every screen size: the section pins, the hours slide sideways and the clock runs.
+  // On a phone the address bar sliding away must not restart it, and each hour gets a longer
+  // stretch of scroll so one swipe does not skip past it.
+  ScrollTrigger.config({ ignoreMobileResize: true });
+  day.classList.add('is-horizontal');
+  const dist = () => track.scrollWidth - innerWidth;
+  const stretch = () => (innerWidth < 900 ? 1.8 : 1);
+  const ride = gsap.to(track, {
+    x: () => -dist(), ease: 'none',
+    scrollTrigger: { trigger: day, pin: true, scrub: .5, start: 'top top', end: () => `+=${dist() * stretch()}`, anticipatePin: 1, invalidateOnRefresh: true, onUpdate: (s) => paintClock(s.progress) },
   });
-  mm.add('(max-width: 899px)', () => {
-    hours.forEach((hour) => gsap.from(hourBits(hour), { y: 32, opacity: 0, stagger: .06, scrollTrigger: { trigger: hour, start: 'top 70%' } }));
-    dayDoodles.forEach((d) => ScrollTrigger.create({ trigger: d, start: 'top 85%', once: true, onEnter: () => draw($$('path', d)) }));
+  paintClock(0);
+  hours.forEach((hour) => {
+    gsap.from(hourBits(hour), { y: 40, opacity: 0, stagger: .06, scrollTrigger: { trigger: hour, containerAnimation: ride, start: 'left 62%' } });
+    $$('.hour__img', hour).forEach((im) => gsap.fromTo(im, { xPercent: 14 }, { xPercent: -14, ease: 'none', scrollTrigger: { trigger: hour, containerAnimation: ride, start: 'left right', end: 'right left', scrub: true } }));
+    $$('.draw', hour).forEach((d) => ScrollTrigger.create({ trigger: hour, containerAnimation: ride, start: 'left 50%', once: true, onEnter: () => draw($$('path', d)) }));
   });
+  $$('.hour--intro .draw').forEach((d) => ScrollTrigger.create({ trigger: day, start: 'top 60%', once: true, onEnter: () => draw($$('path', d), .2) }));
 
   /* everything else reveals in rhythm */
   $$('[data-split]').forEach((h) => {
